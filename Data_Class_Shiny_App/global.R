@@ -1,7 +1,7 @@
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-library(plotly)
+library(plotly) # don't really need this one
 library(cowplot)
 library(DT)
 library(shiny)

@@ -1,7 +1,3 @@
-
-## Can also put all this stuff into a global.R file. In global.R you can include source() which allows
-## you to call to lots of other files to get functions, data, etc.
-
 function(input, output) {
 
  output$main_plot <- 
