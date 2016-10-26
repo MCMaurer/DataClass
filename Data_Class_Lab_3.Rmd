@@ -1,0 +1,57 @@
+---
+title: "Data_Class_Lab_3"
+author: "Michael Culshaw-Maurer"
+date: "10/14/2016"
+output: html_document
+---
+
+```{r, results='hide', warning=FALSE, message=FALSE}
+library(RPostgreSQL)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(plotly)
+library(cowplot)
+```
+
+
+```{r,echo=FALSE}
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "Geocoris", host = "localhost",
+                 user = "postgres", password = "Coleslaw1")
+```
+
+```{r}
+dbListTables(con)
+
+myTable <- dbGetQuery(con, "SELECT field_surveys.sampling_date, field_surveys.field, field_surveys.crop, 
+cannibalism_assays.bug_id, cannibalism_assays.healthy,cannibalism_assays.cannibalized,
+cannibalism_assays.partial_,cannibalism_assays.crushed, cannibalism_assays.species
+FROM field_surveys FULL OUTER JOIN cannibalism_assays ON (sampling_id = survey_id);")
+
+write.csv(myTable, "Data_Class_Shiny_App/data/Geocoris_Joined_Table_From_DB_Try_2")
+```
+
+
+```{r}
+myTable$cannibalism_rate <- myTable$cannibalized / (myTable$healthy + myTable$cannibalized)
+
+plot1 <- myTable %>%
+  filter(cannibalism_rate >= 0.1) %>%
+  ggplot(aes(x=field, y=cannibalism_rate, fill = crop))+
+  geom_violin()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+plot2 <- myTable %>%
+  ggplot(aes(x=field, y=cannibalism_rate, fill = crop))+
+  geom_violin()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplotly(plot1)
+
+ggplotly(plot2)
+
+
+```
+
+
